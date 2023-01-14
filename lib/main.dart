@@ -1,6 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -39,31 +46,57 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          FirebaseFirestore.instance.collection('categories').add(
+            {
+              'title': 'Super kategoria',
+            },
+          );
+        },
         backgroundColor: const Color.fromARGB(255, 30, 195, 115),
         child: const Icon(Icons.add),
       ),
-      body: ListView(
-        children: const [
-          CategoryWidget(),
-        ],
-      ),
+      body: StreamBuilder<QuerySnapshot>(
+          stream:
+              FirebaseFirestore.instance.collection('categories').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text('An unexpected problem occured');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text('Please wait, the app is loading data');
+            }
+
+            final documents = snapshot.data!.docs;
+
+            return ListView(
+              children: [
+                for (final document in documents) ...[
+                  CategoryWidget(document['title']),
+                ],
+              ],
+            );
+          }),
     );
   }
 }
 
 class CategoryWidget extends StatelessWidget {
-  const CategoryWidget({
+  const CategoryWidget(
+    this.title, {
     Key? key,
   }) : super(key: key);
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: const Color.fromARGB(255, 147, 227, 227),
       padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.all(20),
-      child: const Text('Kategoria 1'),
+      margin: const EdgeInsets.all(18),
+      child: Text(title),
     );
   }
 }
