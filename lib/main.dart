@@ -43,6 +43,27 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 30, 195, 115),
         child: const Icon(Icons.add),
       ),
+      body: ListView(
+        children: const [
+          CategoryWidget(),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryWidget extends StatelessWidget {
+  const CategoryWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color.fromARGB(255, 147, 227, 227),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
+      child: const Text('Kategoria 1'),
     );
   }
 }
